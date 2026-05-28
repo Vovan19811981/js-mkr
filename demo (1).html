@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JavaScript МКР — Практична частина</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --code-bg: #0d1117;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 32px; height: 56px;
+  }
+  nav .logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--accent); margin-right: 16px;
+    white-space: nowrap;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none;
+    font-size: 13px; padding: 6px 12px;
+    border-radius: 6px; transition: all .2s;
+    white-space: nowrap;
+  }
+  nav a:hover { color: var(--text); background: var(--surface2); }
+
+  /* HERO */
+  .hero {
+    padding: 72px 32px 48px;
+    max-width: 900px; margin: 0 auto;
+    text-align: center;
+  }
+  .hero h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(22px, 4vw, 38px);
+    font-weight: 700; line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); max-width: 560px; margin: 0 auto; }
+
+  /* SECTIONS */
+  .section {
+    max-width: 900px; margin: 0 auto 64px;
+    padding: 0 32px;
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .task-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px; font-weight: 700;
+    background: var(--accent); color: #000;
+    padding: 4px 10px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .task-num.t2 { background: var(--accent2); }
+  .task-num.t3 { background: var(--accent4); }
+  .task-num.t4 { background: var(--accent3); }
+  .section-header h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px; font-weight: 700;
+  }
+
+  /* CODE BLOCK */
+  .code-wrap {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-header span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--muted);
+  }
+  .copy-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); padding: 3px 10px;
+    border-radius: 5px; font-size: 11px;
+    cursor: pointer; transition: all .2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  pre {
+    padding: 20px; overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; line-height: 1.7;
+    color: #e6edf3;
+  }
+  .kw  { color: #ff7b72; }
+  .fn  { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .cm  { color: #6a737d; font-style: italic; }
+  .num { color: #79c0ff; }
+  .op  { color: #ff7b72; }
+
+  /* DEMO PANELS */
+  .demo-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px;
+    margin-bottom: 16px;
+  }
+  .demo-panel h3 {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: .08em; margin-bottom: 16px;
+  }
+
+  /* TASK 1 */
+  .t1-input {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    margin-bottom: 16px;
+  }
+  .t1-input input {
+    flex: 1; min-width: 200px;
+    background: var(--code-bg); border: 1px solid var(--border);
+    color: var(--text); padding: 9px 14px; border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    outline: none; transition: border-color .2s;
+  }
+  .t1-input input:focus { border-color: var(--accent); }
+  .btn {
+    padding: 9px 18px; border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all .2s; font-family: 'Inter', sans-serif;
+  }
+  .btn-blue  { background: var(--accent);  color: #000; }
+  .btn-green { background: var(--accent2); color: #000; }
+  .btn-purple{ background: var(--accent4); color: #000; }
+  .btn-red   { background: var(--accent3); color: #000; }
+  .btn:hover { opacity: .85; transform: translateY(-1px); }
+
+  .result-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; min-height: 60px;
+    white-space: pre-wrap; line-height: 1.6;
+  }
+  .result-key   { color: #79c0ff; }
+  .result-val   { color: #a5d6ff; }
+  .result-num   { color: #f0883e; }
+  .result-str   { color: #3fb950; }
+  .result-undef { color: #8b949e; }
+
+  /* TASK 2 */
+  .product-list {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .product-row {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .product-row input {
+    background: var(--code-bg); border: 1px solid var(--border);
+    color: var(--text); padding: 7px 12px; border-radius: 7px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    outline: none;
+  }
+  .product-row input:focus { border-color: var(--accent2); }
+  .product-row input.name-f { flex: 2; }
+  .product-row input.price-f { flex: 1; }
+  .stock-toggle {
+    padding: 7px 12px; border-radius: 7px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted);
+    cursor: pointer; font-size: 12px; white-space: nowrap;
+    transition: all .2s;
+  }
+  .stock-toggle.in { background: #1a3a2a; border-color: var(--accent2); color: var(--accent2); }
+  .del-row {
+    background: none; border: none; color: var(--accent3);
+    cursor: pointer; font-size: 16px; padding: 4px 8px;
+    border-radius: 5px; transition: background .15s;
+  }
+  .del-row:hover { background: #2d1a1a; }
+  .add-row-btn {
+    background: none; border: 1px dashed var(--border);
+    color: var(--muted); padding: 8px; border-radius: 7px;
+    cursor: pointer; font-size: 13px; transition: all .2s;
+    width: 100%; font-family: 'Inter', sans-serif;
+  }
+  .add-row-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* TASK 3 */
+  .api-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .api-row input {
+    flex: 1; background: var(--code-bg);
+    border: 1px solid var(--border); color: var(--text);
+    padding: 9px 14px; border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    outline: none;
+  }
+  .api-row input:focus { border-color: var(--accent4); }
+  .counter-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 13px; color: var(--muted); margin-bottom: 12px;
+  }
+  .counter-badge strong { color: var(--accent4); font-family: 'JetBrains Mono', monospace; }
+  .spinner {
+    display: none; width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent4);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TASK 4 — todo */
+  .todo-input-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  #taskInput4 {
+    flex: 1; background: var(--code-bg);
+    border: 1px solid var(--border); color: var(--text);
+    padding: 10px 14px; border-radius: 8px;
+    font-size: 14px; outline: none; transition: border-color .2s;
+  }
+  #taskInput4:focus { border-color: var(--accent3); }
+  #taskList4 { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  #taskList4 li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: pointer; transition: all .15s; user-select: none;
+  }
+  #taskList4 li:hover { border-color: var(--accent3); }
+  #taskList4 li.done { opacity: .55; }
+  #taskList4 li.done .todo-text { text-decoration: line-through; color: var(--muted); }
+  .todo-icon { font-size: 16px; }
+  .todo-text { flex: 1; font-size: 14px; }
+  .todo-del {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    font-size: 14px; padding: 2px 7px; border-radius: 5px;
+    transition: all .15s;
+  }
+  .todo-del:hover { color: var(--accent3); background: #2d1a1a; }
+  .todo-stats {
+    margin-top: 12px; font-size: 12px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .empty-todo { color: var(--muted); font-size: 13px; text-align: center; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">JS МКР</div>
+  <a href="#task1">Завдання 1</a>
+  <a href="#task2">Завдання 2</a>
+  <a href="#task3">Завдання 3</a>
+  <a href="#task4">Завдання 4</a>
+</nav>
+
+<div class="hero">
+  <h1>Практична частина<br><span>JavaScript МКР</span></h1>
+  <p>Демонстрація роботи всіх 4 практичних завдань в інтерактивному режимі</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ TASK 1 -->
+<div class="section" id="task1">
+  <div class="section-header">
+    <span class="task-num">5 балів</span>
+    <h2>Завдання 1 — summarizeNumbers</h2>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span>task1.js</span>
+      <button class="copy-btn" onclick="copyCode('code1')">Копіювати</button>
+    </div>
+    <pre id="code1"><span class="cm">// Завдання 1 — Змінні, умови, цикли, функції</span>
+
+<span class="kw">function</span> <span class="fn">summarizeNumbers</span>(numbers) {
+  <span class="kw">if</span> (!numbers || numbers.length === <span class="num">0</span>) {
+    <span class="kw">return</span> { count: <span class="num">0</span>, sum: <span class="num">0</span>, evenCount: <span class="num">0</span>, max: <span class="kw">undefined</span>, category: <span class="str">"empty"</span> };
+  }
+
+  <span class="kw">let</span> sum = <span class="num">0</span>, evenCount = <span class="num">0</span>, max = numbers[<span class="num">0</span>];
+
+  <span class="cm">// Цикл для обчислень (без методів вищого порядку)</span>
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt; numbers.length; i++) {
+    <span class="kw">const</span> n = numbers[i];
+    sum += n;
+    <span class="kw">if</span> (n % <span class="num">2</span> === <span class="num">0</span>) evenCount++;
+    <span class="kw">if</span> (n &gt; max) max = n;
+  }
+
+  <span class="kw">const</span> category = sum &gt; <span class="num">0</span> ? <span class="str">"positive"</span> : <span class="str">"non-positive"</span>;
+  <span class="kw">return</span> { count: numbers.length, sum, evenCount, max, category };
+}</pre>
+  </div>
+
+  <div class="demo-panel">
+    <h3>Інтерактивна демонстрація</h3>
+    <div class="t1-input">
+      <input id="t1in" value="4, 7, 2, 9" placeholder="Введіть числа через кому"/>
+      <button class="btn btn-blue" onclick="runTask1()">Виконати</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="btn btn-blue" style="font-size:12px;padding:6px 12px" onclick="setT1('[4,7,2,9]')">▶ [4,7,2,9]</button>
+      <button class="btn btn-blue" style="font-size:12px;padding:6px 12px" onclick="setT1('[]')">▶ []</button>
+      <button class="btn btn-blue" style="font-size:12px;padding:6px 12px" onclick="setT1('[-3,-1,-2]')">▶ [-3,-1,-2]</button>
+      <button class="btn btn-blue" style="font-size:12px;padding:6px 12px" onclick="setT1('[0]')">▶ [0]</button>
+    </div>
+    <div class="result-box" id="t1result">← Натисніть «Виконати»</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ TASK 2 -->
+<div class="section" id="task2">
+  <div class="section-header">
+    <span class="task-num t2">5 балів</span>
+    <h2>Завдання 2 — processProducts</h2>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span>task2.js</span>
+      <button class="copy-btn" onclick="copyCode('code2')">Копіювати</button>
+    </div>
+    <pre id="code2"><span class="cm">// Завдання 2 — Масиви, об'єкти, функції вищого порядку</span>
+
+<span class="kw">function</span> <span class="fn">processProducts</span>(products) {
+  <span class="kw">const</span> inStock = products.<span class="fn">filter</span>(p => p.inStock === <span class="kw">true</span>);
+
+  <span class="kw">const</span> available  = inStock.<span class="fn">map</span>(p => p.name);
+  <span class="kw">const</span> totalPrice = inStock.<span class="fn">reduce</span>((acc, p) => acc + p.price, <span class="num">0</span>);
+  <span class="kw">const</span> cheapest   = inStock.length &gt; <span class="num">0</span>
+    ? inStock.<span class="fn">reduce</span>((min, p) => p.price &lt; min.price ? p : min).name
+    : <span class="kw">null</span>;
+  <span class="kw">const</span> priceList  = products.<span class="fn">map</span>(p => <span class="str">`${p.name} — ${p.price} грн`</span>);
+
+  <span class="kw">return</span> { available, totalPrice, cheapest, priceList };
+}</pre>
+  </div>
+
+  <div class="demo-panel">
+    <h3>Редагуйте товари і натисніть «Обчислити»</h3>
+    <div class="product-list" id="productList"></div>
+    <button class="add-row-btn" onclick="addProductRow()">+ Додати товар</button>
+    <br/><br/>
+    <button class="btn btn-green" onclick="runTask2()">Обчислити</button>
+    <br/><br/>
+    <div class="result-box" id="t2result">← Натисніть «Обчислити»</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ TASK 3 -->
+<div class="section" id="task3">
+  <div class="section-header">
+    <span class="task-num t3">5 балів</span>
+    <h2>Завдання 3 — createApiClient</h2>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span>task3.js</span>
+      <button class="copy-btn" onclick="copyCode('code3')">Копіювати</button>
+    </div>
+    <pre id="code3"><span class="cm">// Завдання 3 — Замикання та async/await</span>
+
+<span class="kw">function</span> <span class="fn">createApiClient</span>(baseUrl) {
+  <span class="kw">let</span> requestCount = <span class="num">0</span>; <span class="cm">// приватний лічильник у замиканні</span>
+
+  <span class="kw">return</span> {
+    <span class="kw">async</span> <span class="fn">get</span>(path) {
+      <span class="kw">try</span> {
+        <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(baseUrl + path);
+        <span class="kw">if</span> (!response.ok) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="str">`HTTP ${response.status}`</span>);
+        <span class="kw">const</span> data = <span class="kw">await</span> response.<span class="fn">json</span>();
+        requestCount++;
+        <span class="kw">return</span> data;
+      } <span class="kw">catch</span> (e) {
+        requestCount++;
+        <span class="kw">return</span> { error: <span class="str">"Запит не вдався"</span> };
+      }
+    },
+    <span class="fn">getRequestCount</span>() { <span class="kw">return</span> requestCount; }
+  };
+}</pre>
+  </div>
+
+  <div class="demo-panel">
+    <h3>Живий запит до JSONPlaceholder API</h3>
+    <div class="counter-badge">
+      Запитів виконано: <strong id="reqCount">0</strong>
+      <div class="spinner" id="spinner"></div>
+    </div>
+    <div class="api-row">
+      <input id="apiPath" value="/users/1" placeholder="/path"/>
+      <button class="btn btn-purple" onclick="runApiGet()">GET</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <button class="btn btn-purple" style="font-size:12px;padding:6px 12px" onclick="setPath('/users/1')">▶ /users/1</button>
+      <button class="btn btn-purple" style="font-size:12px;padding:6px 12px" onclick="setPath('/posts/1')">▶ /posts/1</button>
+      <button class="btn btn-purple" style="font-size:12px;padding:6px 12px" onclick="setPath('/todos/1')">▶ /todos/1</button>
+      <button class="btn btn-purple" style="font-size:12px;padding:6px 12px" onclick="setPath('/bad-path')">▶ /bad-path (помилка)</button>
+    </div>
+    <div class="result-box" id="t3result">← Натисніть GET</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ TASK 4 -->
+<div class="section" id="task4">
+  <div class="section-header">
+    <span class="task-num t4">5 балів</span>
+    <h2>Завдання 4 — TodoList (Класи + DOM)</h2>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span>task4.js (скорочено)</span>
+      <button class="copy-btn" onclick="copyCode('code4')">Копіювати</button>
+    </div>
+    <pre id="code4"><span class="cm">// Завдання 4 — Класи, ООП та DOM</span>
+
+<span class="kw">class</span> <span class="fn">Task</span> {
+  <span class="fn">constructor</span>(id, text) {
+    <span class="kw">this</span>.id = id; <span class="kw">this</span>.text = text; <span class="kw">this</span>.done = <span class="kw">false</span>;
+  }
+  <span class="fn">toggle</span>() { <span class="kw">this</span>.done = !<span class="kw">this</span>.done; }
+}
+
+<span class="kw">class</span> <span class="fn">TodoList</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.tasks = []; <span class="kw">this</span>.nextId = <span class="num">1</span>; }
+  <span class="fn">add</span>(text)   { <span class="kw">const</span> t = <span class="kw">new</span> <span class="fn">Task</span>(<span class="kw">this</span>.nextId++, text); <span class="kw">this</span>.tasks.push(t); }
+  <span class="fn">remove</span>(id)  { <span class="kw">this</span>.tasks = <span class="kw">this</span>.tasks.<span class="fn">filter</span>(t => t.id !== id); }
+  <span class="fn">getActive</span>() { <span class="kw">return</span> <span class="kw">this</span>.tasks.<span class="fn">filter</span>(t => !t.done); }
+}
+
+<span class="cm">// Делегування подій — один обробник на весь список</span>
+taskListEl.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, e => {
+  <span class="kw">const</span> li = e.target.<span class="fn">closest</span>(<span class="str">'li[data-id]'</span>);
+  <span class="kw">if</span> (!li) <span class="kw">return</span>;
+  <span class="kw">const</span> id = Number(li.dataset.id);
+  <span class="kw">if</span> (e.target.dataset.action === <span class="str">'delete'</span>) todoList.<span class="fn">remove</span>(id);
+  <span class="kw">else</span> todoList.<span class="fn">getById</span>(id)?.<span class="fn">toggle</span>();
+  <span class="fn">render</span>();
+});</pre>
+  </div>
+
+  <div class="demo-panel">
+    <h3>Живе демо</h3>
+    <div class="todo-input-row">
+      <input id="taskInput4" placeholder="Нове завдання..." />
+      <button class="btn btn-red" id="addBtn4">Додати</button>
+    </div>
+    <ul id="taskList4"></ul>
+    <div class="todo-stats" id="todoStats"></div>
+  </div>
+</div>
+
+<div style="height:60px"></div>
+
+<script>
+// ═══════════════════ TASK 1 ═══════════════════
+function summarizeNumbers(numbers) {
+  if (!numbers || numbers.length === 0)
+    return { count: 0, sum: 0, evenCount: 0, max: undefined, category: "empty" };
+  let sum = 0, evenCount = 0, max = numbers[0];
+  for (let i = 0; i < numbers.length; i++) {
+    const n = numbers[i];
+    sum += n;
+    if (n % 2 === 0) evenCount++;
+    if (n > max) max = n;
+  }
+  return { count: numbers.length, sum, evenCount, max,
+    category: sum > 0 ? "positive" : "non-positive" };
+}
+
+function formatResult1(obj) {
+  const lines = [];
+  for (const [k, v] of Object.entries(obj)) {
+    const val = v === undefined
+      ? `<span class="result-undef">undefined</span>`
+      : typeof v === 'number'
+        ? `<span class="result-num">${v}</span>`
+        : `<span class="result-str">"${v}"</span>`;
+    lines.push(`  <span class="result-key">${k}</span>: ${val}`);
+  }
+  return `{\n${lines.join(',\n')}\n}`;
+}
+
+function runTask1() {
+  const raw = document.getElementById('t1in').value.trim();
+  let arr;
+  try {
+    arr = raw === '' || raw === '[]' ? [] : JSON.parse('[' + raw.replace(/^\[|\]$/g,'') + ']');
+    if (!Array.isArray(arr)) throw new Error();
+  } catch {
+    document.getElementById('t1result').innerHTML = '<span style="color:#f78166">Помилка: введіть числа через кому</span>';
+    return;
+  }
+  const res = summarizeNumbers(arr);
+  document.getElementById('t1result').innerHTML = formatResult1(res);
+}
+
+function setT1(str) {
+  const nums = str === '[]' ? '' : str.replace(/^\[|\]$/g,'');
+  document.getElementById('t1in').value = nums;
+  runTask1();
+}
+
+// ═══════════════════ TASK 2 ═══════════════════
+function processProducts(products) {
+  const inStock = products.filter(p => p.inStock === true);
+  const available  = inStock.map(p => p.name);
+  const totalPrice = inStock.reduce((acc, p) => acc + p.price, 0);
+  const cheapest   = inStock.length > 0
+    ? inStock.reduce((min, p) => p.price < min.price ? p : min).name : null;
+  const priceList  = products.map(p => `${p.name} — ${p.price} грн`);
+  return { available, totalPrice, cheapest, priceList };
+}
+
+const defaultProducts = [
+  { name: "Чай",   price: 50,  inStock: true  },
+  { name: "Кава",  price: 120, inStock: false },
+  { name: "Цукор", price: 30,  inStock: true  },
+];
+
+function renderProductList() {
+  const list = document.getElementById('productList');
+  list.innerHTML = '';
+  defaultProducts.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'product-row';
+    row.innerHTML = `
+      <input class="name-f" value="${p.name}" oninput="defaultProducts[${i}].name=this.value" placeholder="Назва"/>
+      <input class="price-f" type="number" value="${p.price}" oninput="defaultProducts[${i}].price=+this.value" placeholder="Ціна"/>
+      <button class="stock-toggle ${p.inStock?'in':''}" onclick="toggleStock(${i},this)">
+        ${p.inStock ? '✓ В наявності' : '✗ Немає'}
+      </button>
+      <button class="del-row" onclick="removeProduct(${i})">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function toggleStock(i, btn) {
+  defaultProducts[i].inStock = !defaultProducts[i].inStock;
+  btn.classList.toggle('in');
+  btn.textContent = defaultProducts[i].inStock ? '✓ В наявності' : '✗ Немає';
+}
+function removeProduct(i) {
+  defaultProducts.splice(i, 1);
+  renderProductList();
+}
+function addProductRow() {
+  defaultProducts.push({ name: "Новий", price: 0, inStock: true });
+  renderProductList();
+}
+
+function runTask2() {
+  const res = processProducts(defaultProducts);
+  const av  = res.available.length
+    ? res.available.map(n=>`<span class="result-str">"${n}"</span>`).join(', ')
+    : '<span class="result-undef">[]</span>';
+  const pl  = res.priceList.map(s=>`<span class="result-str">"${s}"</span>`).join(',\n    ');
+  const ch  = res.cheapest
+    ? `<span class="result-str">"${res.cheapest}"</span>`
+    : `<span class="result-undef">null</span>`;
+  document.getElementById('t2result').innerHTML =
+`{
+  <span class="result-key">available</span>:   [${av}],
+  <span class="result-key">totalPrice</span>:  <span class="result-num">${res.totalPrice}</span>,
+  <span class="result-key">cheapest</span>:    ${ch},
+  <span class="result-key">priceList</span>:   [
+    ${pl}
+  ]
+}`;
+}
+
+renderProductList();
+
+// ═══════════════════ TASK 3 ═══════════════════
+function createApiClient(baseUrl) {
+  let requestCount = 0;
+  return {
+    async get(path) {
+      try {
+        const response = await fetch(baseUrl + path);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        requestCount++;
+        return data;
+      } catch (e) {
+        requestCount++;
+        return { error: "Запит не вдався" };
+      }
+    },
+    getRequestCount() { return requestCount; }
+  };
+}
+
+const api = createApiClient("https://jsonplaceholder.typicode.com");
+
+async function runApiGet() {
+  const path = document.getElementById('apiPath').value.trim() || '/users/1';
+  const spin = document.getElementById('spinner');
+  const box  = document.getElementById('t3result');
+  spin.style.display = 'block';
+  box.innerHTML = '<span style="color:#8b949e">Завантаження...</span>';
+
+  const data = await api.get(path);
+  spin.style.display = 'none';
+  document.getElementById('reqCount').textContent = api.getRequestCount();
+
+  const json = JSON.stringify(data, null, 2);
+  const colored = json
+    .replace(/"([^"]+)":/g, `<span class="result-key">"$1"</span>:`)
+    .replace(/: "([^"]+)"/g, `: <span class="result-str">"$1"</span>`)
+    .replace(/: (\d+)/g, `: <span class="result-num">$1</span>`)
+    .replace(/: (true|false)/g, `: <span class="kw">$1</span>`);
+  box.innerHTML = colored;
+}
+
+function setPath(p) {
+  document.getElementById('apiPath').value = p;
+  runApiGet();
+}
+
+// ═══════════════════ TASK 4 ═══════════════════
+class Task {
+  constructor(id, text) { this.id = id; this.text = text; this.done = false; }
+  toggle() { this.done = !this.done; }
+}
+class TodoList {
+  constructor() { this.tasks = []; this.nextId = 1; }
+  add(text)    { const t = new Task(this.nextId++, text.trim()); this.tasks.push(t); return t; }
+  remove(id)   { this.tasks = this.tasks.filter(t => t.id !== id); }
+  getActive()  { return this.tasks.filter(t => !t.done); }
+  getById(id)  { return this.tasks.find(t => t.id === id); }
+}
+
+const todoList   = new TodoList();
+const taskInput4 = document.getElementById('taskInput4');
+const taskList4  = document.getElementById('taskList4');
+const todoStats  = document.getElementById('todoStats');
+
+function renderTodo() {
+  taskList4.innerHTML = '';
+  if (todoList.tasks.length === 0) {
+    taskList4.innerHTML = '<li class="empty-todo" style="cursor:default;list-style:none">Завдань ще немає — додайте перше!</li>';
+    todoStats.textContent = '';
+    return;
+  }
+  todoList.tasks.forEach(task => {
+    const li = document.createElement('li');
+    li.dataset.id = task.id;
+    if (task.done) li.classList.add('done');
+    li.innerHTML = `
+      <span class="todo-icon">${task.done ? '✅' : '⬜'}</span>
+      <span class="todo-text">${task.text}</span>
+      <button class="todo-del" data-action="delete" title="Видалити">✕</button>
+    `;
+    taskList4.appendChild(li);
+  });
+  const active = todoList.getActive().length;
+  todoStats.textContent = `getActive(): ${active} незавершених / всього: ${todoList.tasks.length}`;
+}
+
+document.getElementById('addBtn4').addEventListener('click', () => {
+  const text = taskInput4.value.trim();
+  if (!text) return;
+  todoList.add(text);
+  taskInput4.value = '';
+  taskInput4.focus();
+  renderTodo();
+});
+
+taskInput4.addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('addBtn4').click();
+});
+
+// Делегування подій
+taskList4.addEventListener('click', e => {
+  const li = e.target.closest('li[data-id]');
+  if (!li) return;
+  const id = Number(li.dataset.id);
+  if (e.target.dataset.action === 'delete') todoList.remove(id);
+  else todoList.getById(id)?.toggle();
+  renderTodo();
+});
+
+renderTodo();
+
+// ═══════════════════ UTILS ═══════════════════
+function copyCode(id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Скопійовано ✓';
+    setTimeout(() => btn.textContent = 'Копіювати', 1500);
+  });
+}
+</script>
+</body>
+</html>

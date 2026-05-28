@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Завдання 4 — TodoList</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        padding: 40px 16px;
+      }
+
+      .container {
+        background: #fff;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 22px;
+        margin-bottom: 20px;
+        color: #1a1a2e;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+
+      #taskInput {
+        flex: 1;
+        padding: 10px 14px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      #taskInput:focus {
+        border-color: #4361ee;
+      }
+
+      #addBtn {
+        padding: 10px 20px;
+        background: #4361ee;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      #addBtn:hover {
+        background: #3a56d4;
+      }
+
+      #taskList {
+        list-style: none;
+      }
+
+      #taskList li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: #f8f9ff;
+        border: 1px solid #e8eaff;
+        cursor: pointer;
+        transition: background 0.15s;
+        user-select: none;
+      }
+
+      #taskList li:hover {
+        background: #eef0ff;
+      }
+
+      #taskList li.done {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+      }
+
+      #taskList li.done .task-text {
+        text-decoration: line-through;
+        color: #6b7280;
+      }
+
+      .task-text {
+        flex: 1;
+        font-size: 15px;
+        color: #1a1a2e;
+      }
+
+      .task-status {
+        font-size: 18px;
+        margin-right: 10px;
+      }
+
+      .delete-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        color: #f87171;
+        padding: 2px 6px;
+        border-radius: 4px;
+        line-height: 1;
+        transition: background 0.15s;
+      }
+
+      .delete-btn:hover {
+        background: #fee2e2;
+      }
+
+      .stats {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .empty-msg {
+        text-align: center;
+        color: #9ca3af;
+        padding: 20px 0;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📝 Список завдань</h1>
+
+      <div class="input-row">
+        <input id="taskInput" placeholder="Нове завдання..." />
+        <button id="addBtn">Додати</button>
+      </div>
+
+      <ul id="taskList"></ul>
+
+      <div class="stats" id="stats"></div>
+    </div>
+
+    <script>
+      /**
+       * Клас Task — одне завдання.
+       */
+      class Task {
+        constructor(id, text) {
+          this.id = id;
+          this.text = text;
+          this.done = false; // за замовчуванням не виконано
+        }
+
+        /** Інвертує стан done */
+        toggle() {
+          this.done = !this.done;
+        }
+      }
+
+      /**
+       * Клас TodoList — керування списком завдань.
+       */
+      class TodoList {
+        constructor() {
+          this.tasks = [];
+          this.nextId = 1; // унікальний лічильник id
+        }
+
+        /** Додає нове завдання */
+        add(text) {
+          const task = new Task(this.nextId++, text.trim());
+          this.tasks.push(task);
+          return task;
+        }
+
+        /** Видаляє завдання за id */
+        remove(id) {
+          this.tasks = this.tasks.filter((t) => t.id !== id);
+        }
+
+        /** Повертає масив незавершених завдань */
+        getActive() {
+          return this.tasks.filter((t) => !t.done);
+        }
+
+        /** Знаходить завдання за id */
+        getById(id) {
+          return this.tasks.find((t) => t.id === id);
+        }
+      }
+
+      // ─── DOM-логіка ───────────────────────────────────────────
+
+      const todoList = new TodoList();
+
+      const taskInput = document.getElementById("taskInput");
+      const addBtn = document.getElementById("addBtn");
+      const taskListEl = document.getElementById("taskList");
+      const statsEl = document.getElementById("stats");
+
+      /** Рендеримо весь список */
+      function render() {
+        taskListEl.innerHTML = "";
+
+        if (todoList.tasks.length === 0) {
+          taskListEl.innerHTML =
+            '<li class="empty-msg" style="cursor:default">Завдань ще немає</li>';
+          statsEl.textContent = "";
+          return;
+        }
+
+        todoList.tasks.forEach((task) => {
+          const li = document.createElement("li");
+          li.dataset.id = task.id;
+          if (task.done) li.classList.add("done");
+
+          li.innerHTML = `
+            <span class="task-status">${task.done ? "✅" : "⬜"}</span>
+            <span class="task-text">${escapeHtml(task.text)}</span>
+            <button class="delete-btn" data-action="delete" title="Видалити">✕</button>
+          `;
+
+          taskListEl.appendChild(li);
+        });
+
+        const active = todoList.getActive().length;
+        const total = todoList.tasks.length;
+        statsEl.textContent = `Виконано: ${total - active} / ${total}`;
+      }
+
+      /** Екранування HTML для безпеки */
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      /** Додавання завдання */
+      function addTask() {
+        const text = taskInput.value.trim();
+        if (!text) {
+          taskInput.focus();
+          return;
+        }
+        todoList.add(text);
+        taskInput.value = "";
+        taskInput.focus();
+        render();
+      }
+
+      // Кнопка «Додати»
+      addBtn.addEventListener("click", addTask);
+
+      // Enter у полі вводу
+      taskInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addTask();
+      });
+
+      // Делегування подій на список — один обробник для toggle і delete
+      taskListEl.addEventListener("click", (e) => {
+        const li = e.target.closest("li[data-id]");
+        if (!li) return;
+
+        const id = Number(li.dataset.id);
+
+        // Клік по кнопці видалення
+        if (e.target.dataset.action === "delete") {
+          todoList.remove(id);
+          render();
+          return;
+        }
+
+        // Клік по будь-якому іншому місцю рядка — перемикаємо стан
+        const task = todoList.getById(id);
+        if (task) {
+          task.toggle();
+          render();
+        }
+      });
+
+      // Початковий рендер
+      render();
+    </script>
+  </body>
+</html>
